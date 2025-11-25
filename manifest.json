@@ -1,0 +1,10 @@
+{
+  "id": "quick-open-commands",
+  "name": "Quick Open Commands",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "자주 여는 파일에 빠른 명령을 추가하세요",
+  "author": "ujupatipanno",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
