@@ -1,27 +1,24 @@
-# Quick Open Commands (Obsidian community plugin)
 
-Adds quick commands that open frequently used markdown files in your vault. Commands are manageable from the plugin settings tab and appear in the command palette so you can bind shortcuts.
+# Quick Open Commands (옵시디언 플러그인)
 
-## Features
-- Add/remove commands that open specific files
-- Commands show in command palette and can be assigned hotkeys
-- File-existence warning in settings
-- Search/filter commands when 5+ items exist
+`Quick Open Commands`는 자주 여는 노트(마크다운 파일)를 명령으로 등록하여 명령 팔레트나 단축키로 빠르게 여는 Obsidian 커뮤니티 플러그인입니다.
 
-## Development
+## 주요 기능
+- 특정 파일(노트)을 명령으로 등록 및 삭제
+- 명령 팔레트에 표시되어 단축키 바인딩 가능
+- 설정 탭에서 등록된 명령 관리(파일 경로 표시, 파일 없음 경고)
+- 검색/필터링(설정 탭)
+- Vault에서 파일이 삭제되면 해당 명령 자동 제거
+- 활성 탭의 노트를 현재 명령으로 추가하는 명령 제공
 
-Prerequisites:
-- Node.js (recommended v16+)
+## 설치 (사용자)
+1. 플러그인 파일(`manifest.json`, `main.js`)을 Obsidian Vault의 플러그인 폴더로 복사합니다.
+	 - 예: `YOUR_VAULT/.obsidian/plugins/quick-open-commands/`
+2. Obsidian을 열고 커뮤니티 플러그인에서 `Quick Open Commands`를 활성화합니다.
 
-Install dev dependencies and build:
-
-```powershell
-npm install
-npm run build
-```
-
-After `npm run build`, copy the plugin folder (the files `manifest.json`, `main.js`, and `README.md`) into your Obsidian vault plugin folder (e.g. `.obsidian/plugins/quick-open-commands`) and enable the plugin in Obsidian.
-
-## Notes
-- This repository uses `esbuild` to bundle `src/main.ts` into `main.js` for Obsidian.
-- If you need a development hot-reload setup, I can add a watch-builder or the official community plugin template flow.
+## 사용법
+- 설정 탭: 등록된 명령 목록 확인, 새 명령 추가, 삭제, 파일 상태 경고 확인
+- 명령 팔레트(Ctrl/Cmd+P): "폴더/파일명 열기" 형식으로 검색 후 실행
+- 명령 추가 방법:
+	- 설정 탭에서 `+ 새 명령 추가` 버튼을 눌러 Vault 내 파일을 선택
+	- 또는 명령 팔레트에서 `현재 탭 노트 추가`를 실행하여 활성 탭의 노트를 등록
