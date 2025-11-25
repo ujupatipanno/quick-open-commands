@@ -57,7 +57,75 @@ class QuickOpenPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     this.registerAllCommands();
+    // Add a command to register the currently active note as a quick-open command
+    this.addCommand({
+      id: 'quick-open-add-current-note',
+      name: '현재 탭 노트 추가',
+      callback: async () => {
+        const file = this.app.workspace.getActiveFile();
+        if (!file || !(file instanceof TFile)) {
+          new Notice('활성 탭에 노트가 열려있지 않습니다');
+          return;
+        }
+        await this.addCommandForFile(file.path);
+      }
+    });
     this.addSettingTab(new QuickOpenSettingTab(this.app, this));
+    // Watch for file rename/move events to keep commands in sync
+    // Use registerEvent so listeners are cleaned up on unload
+    // @ts-ignore
+    this.registerEvent(this.app.vault.on('rename', (file, oldPath: string) => {
+      if (!oldPath) return;
+      const changed = this.settings.commands.filter((c) => c.filePath === oldPath);
+      if (changed.length === 0) return;
+      for (const cfg of changed) {
+        // update stored path to new path
+        cfg.filePath = (file as TFile).path;
+        // re-register command to update displayed name in command palette
+        try {
+          // @ts-ignore
+          this.app.commands.removeCommand(cfg.id);
+        } catch (e) {}
+        this.registerCommandForConfig(cfg);
+      }
+      this.saveSettings();
+      new Notice(`명령 경로 업데이트됨: ${oldPath} → ${(file as TFile).path}`);
+    }));
+
+    // When a file is deleted, remove any registered commands that reference it
+    // @ts-ignore
+    this.registerEvent(this.app.vault.on('delete', async (file) => {
+      const path = (file as TFile).path;
+      const matched = this.settings.commands.filter((c) => c.filePath === path);
+      if (matched.length === 0) return;
+
+      for (const cfg of matched) {
+        // remove from settings array
+        const idx = this.settings.commands.findIndex((c) => c.id === cfg.id);
+        if (idx !== -1) this.settings.commands.splice(idx, 1);
+        try {
+          // @ts-ignore
+          this.app.commands.removeCommand(cfg.id);
+        } catch (e) {}
+      }
+
+      await this.saveSettings();
+      new Notice(`삭제된 파일에 대한 명령이 제거되었습니다: ${path}`);
+      // If settings tab is open, attempt to refresh — best-effort
+      try {
+        // @ts-ignore
+        const tabs = this.app.workspace.getLeavesOfType('settings');
+        for (const leaf of tabs) {
+          // @ts-ignore
+          if (leaf.view && typeof leaf.view.display === 'function') {
+            // @ts-ignore
+            leaf.view.display();
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }));
   }
 
   onunload() {
